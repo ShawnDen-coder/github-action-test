@@ -19,6 +19,7 @@ jobs:
         with:
           export-env: true
         env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           PERSONAL_ACCESS_TOKEN: op://PERSONAL_ACCESS_TOKEN/credential
 
       - name: Create bump and changelog
