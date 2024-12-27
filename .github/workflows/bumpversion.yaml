@@ -1,0 +1,34 @@
+name: Bump version
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  bump-version:
+    if: "!startsWith(github.event.head_commit.message, 'bump:')"
+    runs-on: ubuntu-latest
+    name: "Bump version and create changelog with commitizen"
+    steps:
+      - name: Load secret
+        id: op-load-secret
+        uses: 1password/load-secrets-action@v2
+        with:
+          export-env: false
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          PERSONAL_ACCESS_TOKEN: op://PERSONAL_ACCESS_TOKEN/credential
+
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: '${{ steps.op-load-secret.outputs.PERSONAL_ACCESS_TOKEN }}'
+
+      - name: Create bump and changelog
+        uses: commitizen-tools/commitizen-action@master
+        with:
+          github_token: ${{ steps.op-load-secret.outputs.PERSONAL_ACCESS_TOKEN }}
+          branch: main
