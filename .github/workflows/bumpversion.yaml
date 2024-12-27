@@ -12,23 +12,23 @@ jobs:
     runs-on: ubuntu-latest
     name: "Bump version and create changelog with commitizen"
     steps:
-      - name: Load secret
-        id: op-load-secret
+      - uses: actions/checkout@v3
+
+      - name: Configure 1Password Service Account
+        uses: 1password/load-secrets-action/configure@v2
+        with:
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+
+      - name: setup credentials
+        id: load-credentials
         uses: 1password/load-secrets-action@v2
         with:
           export-env: false
         env:
-          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           PERSONAL_ACCESS_TOKEN: op://PERSONAL_ACCESS_TOKEN/credential
-
-      - name: Check out
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: '${{ steps.op-load-secret.outputs.PERSONAL_ACCESS_TOKEN }}'
 
       - name: Create bump and changelog
         uses: commitizen-tools/commitizen-action@master
         with:
-          github_token: ${{ steps.op-load-secret.outputs.PERSONAL_ACCESS_TOKEN }}
+          github_token: ${{ steps.load-credentials.outputs.PERSONAL_ACCESS_TOKEN }}
           branch: main
