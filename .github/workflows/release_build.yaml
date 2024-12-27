@@ -23,19 +23,22 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
       - uses: abatilo/actions-poetry@v2
         with:
           poetry-version: "latest"
 
-      - name: setup-pypi
-        run: |
-          poetry self add poetry-pyinstaller-plugin
-          poetry self add poetry-plugin-taskipy
+      - name: Install nox
+        run: pip install nox
 
       - name: build and publish
         run: |
           poetry config pypi-token.pypi ${{ env.PYPI_TOKEN }}
-          poetry publish --build
+          poetry install
+          poetry run nox -s lint
+          poetry run nox -s test
+          poetry run nox -s build
+          poetry publish
 
       - name: Release
         uses: softprops/action-gh-release@v2
