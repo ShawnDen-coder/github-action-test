@@ -14,21 +14,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Configure 1Password Service Account
-        uses: 1password/load-secrets-action/configure@v2
-        with:
-          PERSONAL_ACCESS_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-
-      - name: setup credentials
-        id: load-credentials
+      - name: Load secret
         uses: 1password/load-secrets-action@v2
         with:
-          export-env: false
+          export-env: true
         env:
           PERSONAL_ACCESS_TOKEN: op://PERSONAL_ACCESS_TOKEN/credential
 
       - name: Create bump and changelog
         uses: commitizen-tools/commitizen-action@master
         with:
-          github_token: ${{ steps.load-credentials.outputs.PERSONAL_ACCESS_TOKEN }}
+          github_token: ${{ env.PERSONAL_ACCESS_TOKEN }}
           branch: main
